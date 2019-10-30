@@ -114,7 +114,7 @@ def generaXmlEcommerce():
 
 def creaXmlEnvioEcommerce(q, int16, cx):
     # Jesús. Añado una comprobación para que no se envien líneas que estén en eg_lineasecommerceexcluidas
-    cx["cur"].execute("SELECT l.barcode AS barcode, l.cantidad AS cantidad, l.idtpv_linea AS idtpv_linea, l.descripcion AS descripcion FROM tpv_lineascomanda l INNER JOIN articulos a ON l.referencia = a.referencia WHERE l.idtpv_comanda = " + str(q["idtpv_comanda"]) + " AND l.cantidad > 0 AND a.nostock = FALSE AND l.idtpv_linea NOT IN (SELECT idtpv_linea FROM eg_lineasecommerceexcluidas)")
+    cx["cur"].execute("SELECT l.barcode AS barcode, l.cantidad AS cantidad, l.idtpv_linea AS idtpv_linea, l.descripcion AS descripcion FROM tpv_lineascomanda l INNER JOIN articulos a ON l.referencia = a.referencia LEFT OUTER JOIN eg_lineasecommerceexcluidas le ON l.idtpv_linea = le.idtpv_linea WHERE l.idtpv_comanda = " + str(q["idtpv_comanda"]) + " AND l.cantidad > 0 AND a.nostock = FALSE AND le.id IS NULL")
     rows = cx["cur"].fetchall()
     if len(rows) <= 0:
         return False
