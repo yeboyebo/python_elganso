@@ -28,10 +28,10 @@ def confirmShipment():
                 urlShip = url + "/api/orders/" + p["idweb"] + "/ship"
                 result = put_request(urlShip, header)
 
-                # if not result:
-                #    cx["cur"].execute("UPDATE ew_ventaseciweb SET estado = 'ERROR_SHIP' WHERE id = " + str(p["id"]))
-                #else:
-                cx["cur"].execute("UPDATE ew_ventaseciweb SET estado = 'SHIPPED', envioinformado = true WHERE id = " + str(p["id"]))
+                if not result and result != "":
+                    cx["cur"].execute("UPDATE ew_ventaseciweb SET estado = 'ERROR_SHIP' WHERE id = " + str(p["id"]))
+                else:
+                	cx["cur"].execute("UPDATE ew_ventaseciweb SET estado = 'SHIPPED', envioinformado = true WHERE id = " + str(p["id"]))
 
                 cx["conn"].commit()
 

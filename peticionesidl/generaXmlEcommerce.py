@@ -35,11 +35,13 @@ def generaXmlEcommerce():
                 codComanda = q["codigo"]
                 idEcommerce = int(q["idecommerce"])
                 if not creaXmlEnvioEcommerce(q, int16, cx):
-                    cx["cur"].execute("UPDATE idl_ecommerce SET envioidl = TRUE, idlogenvio = 0 WHERE id = " + str(idEcommerce))
+                    cx["cur"].execute("UPDATE idl_ecommerce SET envioidl = TRUE, idlogenvio = 0, confirmacionenvio = 'Si' WHERE id = " + str(idEcommerce))
                     cx["conn"].commit()
                     cx["cur"].execute("DELETE FROM eg_fichprocesados WHERE tipo = 'IDL_ECOMMERCE'")
                     cx["conn"].commit()
-                    return False
+                    cierraConexion(cx)
+                    generaXmlEcommerce()
+                    return True
 
             tree = ET.ElementTree(prepOrd)
             tree.write("./ecommerce/xmlEcommerce_" + codComanda + ".xml")

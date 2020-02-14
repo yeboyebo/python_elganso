@@ -2,8 +2,6 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 import requests
 import json
-from datetime import date
-from datetime import datetime
 
 
 def creaConexion():
@@ -16,8 +14,8 @@ def creaConexion():
 
 def conectaBd():
     try:
-        connect_str = "user='elganso' password='elganso' dbname='elganso'"
-        connect_str += " host='172.26.13.14' port='5432'"
+        connect_str = "user='lorena' password='555zapato' dbname='elganso_ctr'"
+        connect_str += " host='localhost' port='5432'"
 
         return psycopg2.connect(connect_str)
 
@@ -39,13 +37,13 @@ def dameDatosConexion(conexion, cx):
     row = cx["cur"].fetchall()
     valor = row[0]["valor"]
     datosCX = json.loads(valor)
-
+    
     return datosCX
 
 
 def registraLog(tipo, envio, res, cx):
     envio = formateaCadenaLog(envio)
-    res[1] = formateaCadenaLog(res[1])
+    res[1] = formateaCadenaLog(str(res[1]))
 
     cx["cur"].execute("INSERT INTO idl_log (fecha,hora,estado,tipo,envio,respuesta) values (CURRENT_DATE,CURRENT_TIME," + str(res[0]) + ",'" + str(tipo) + "',E'" + str(envio) + "',E'" + str(res[1]) + "')")
     cx["conn"].commit()
@@ -55,6 +53,15 @@ def registraLog(tipo, envio, res, cx):
     idlog = row[0]["id"]
 
     return idlog
+
+
+def registraError(tipo, clave, motivo, cx):
+    motivo = formateaCadenaLog(motivo)
+    
+    cx["cur"].execute("INSERT INTO idl_erroneos (fecha,hora,tipo,clave,motivo) values (CURRENT_DATE,CURRENT_TIME,'" + str(tipo) + "','" + str(clave) + "','" + str(motivo) + "')")
+    cx["conn"].commit()
+
+    return True
 
 
 def formateaCadenaLog(cadena):
@@ -116,6 +123,7 @@ def formateaCadena(cadena):
     oCaracteres["ü"] = "u"
     oCaracteres["ç"] = "c"
     oCaracteres["Ç"] = "C"
+    oCaracteres[";"] = ","
     oCaracteres["'"] = " "
     oCaracteres["\""] = ""
     oCaracteres["\r\n"] = " "
@@ -136,21 +144,24 @@ def formateaCadenaEcommerce(cadena):
     oCaracteres["\r"] = " "
     oCaracteres["\n"] = " "
     oCaracteres["\t"] = " "
+    oCaracteres["'"] = ""
+    oCaracteres[";"] = ","
 
     for c in oCaracteres:
         cadena = cadena.replace(c, oCaracteres[c])
 
-    validos = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚáéíóúñÑÀÈÌÒÙàèìòùÂÊÎÔÛâêîôûÄËÏÖÜäëïöüüçÇ /-?+:,.()"
+    # validos = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚáéíóúñÑÀÈÌÒÙàèìòùÂÊÎÔÛâêîôûÄËÏÖÜäëïöüüçÇ /-?+:,.()"
 
-    cOut = ""
-    i = 0
+    # cOut = ""
+    # i = 0
 
-    while i < len(cadena):
-        if validos.find(cadena[i]) >= 0:
-            cOut += cadena[i]
-        i = i + 1
+    # while i < len(cadena):
+        # if validos.find(cadena[i]) >= 0:
+            # cOut += cadena[i]
+        # i = i + 1
 
-    return cOut
+    # return cOut
+    return cadena
 
 
 def post_request(url, header, data):
@@ -198,25 +209,3 @@ def cerosIzquierda(numero, totalCifras):
         numero = "0" + numero
 
     return numero
-
-
-def put_request(url, header, data={}):
-    try:
-        response = requests.request("PUT", url, data=data, headers=header)
-        print(response.text)
-        response.raise_for_status()
-    except Exception as e:
-        print("Error de comunicacion")
-        print(e)
-        return False
-
-    return response.text.encode("utf-8").decode("ISO8859-15")
-
-
-def formatea_json(jsDatos):
-    jsDatos = jsDatos.replace("'", "\"")
-    jsDatos = jsDatos.replace("None", "null")
-    jsDatos = jsDatos.replace("False", "false")
-    jsDatos = jsDatos.replace("True", "true")
-
-    return jsDatos
