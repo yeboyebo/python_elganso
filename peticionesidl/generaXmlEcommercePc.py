@@ -4,7 +4,7 @@ from xml.etree.ElementTree import tostring
 from util import *
 
 
-def generaXmlEcommerce():
+def generaXmlEcommercePc():
     xmlstring = ""
     res = {}
     res[0] = False
@@ -12,39 +12,39 @@ def generaXmlEcommerce():
 
     cx = creaConexion()
 
-    cx["cur"].execute("SELECT nombre FROM eg_fichprocesados WHERE tipo = 'IDL_ECOMMERCE'")
+    cx["cur"].execute("SELECT nombre FROM eg_fichprocesados WHERE tipo = 'IDL_ECOMMERCE_PC'")
     rows = cx["cur"].fetchall()
     if len(rows) > 0:
         return True
 
-    cx["cur"].execute("INSERT INTO eg_fichprocesados (estado,hora,tipo,nombre,fecha) VALUES ('En proceso',CURRENT_TIME,'IDL_ECOMMERCE','IDL_ECOMMERCE',CURRENT_DATE)")
+    cx["cur"].execute("INSERT INTO eg_fichprocesados (estado,hora,tipo,nombre,fecha) VALUES ('En proceso',CURRENT_TIME,'IDL_ECOMMERCE_PC','IDL_ECOMMERCE_PC',CURRENT_DATE)")
     cx["conn"].commit()
 
     try:
         prepOrd = ET.Element("preparation_orders")
         int16 = ET.SubElement(prepOrd, "int16")
 
-        cx["cur"].execute("SELECT eco.id AS idecommerce, c.idtpv_comanda AS idtpv_comanda, c.codigo AS codigo, c.egcodfactura AS codfactura, (SELECT codalmacenidl FROM almacenesidl WHERE codalmacen = 'AWEB') AS codalmacen, de.mg_nombreenv AS nombrecliente, de.mg_apellidosenv AS apellidoscliente, c.fecha AS fecha, c.fecha AS fechasalida, de.mg_dirtipoviaenv AS dirtipovia, de.mg_direccionenv AS direccion, de.mg_dirnumenv AS dirnum, de.mg_dirotrosenv AS dirotros, de.mg_codpostalenv AS codpostal, de.mg_ciudadenv AS ciudad, de.mg_provinciaenv AS provincia, c.recogidatienda AS recogidatienda, c.codtiendarecogida AS codtiendarecogida, de.mg_email AS email, de.mg_telefonoenv AS telefono, c.cifnif AS cifnif, pa.codiso3 AS codpais, i.textoalbaranidl AS textoalbaranidl, eco.esregalo AS esregalo, eco.imprimiralbaran AS imprimiralbaran, eco.imprimirfactura AS imprimirfactura, eco.imprimirdedicatoria AS imprimirdedicatoria, eco.emisor AS emisor, eco.receptor as receptor, eco.mensajededicatoria AS mensajededicatoria, eco.transportista AS transportista, eco.metodoenvioidl AS metodoenvio, eco.tipo AS tipoenvio, eco.eseciweb AS eseciweb, t.codcliente AS clientetienda, t.descripcion AS nombretienda, t.dirtipovia AS dirtipoviatienda, t.direccion AS direcciontienda, t.dirnum AS dirnumtienda, t.dirotros AS dirotrostienda, t.codpostal AS codpostaltienda, t.ciudad AS ciudadtienda, t.provincia AS provinciatienda, pat.codiso3 AS codpaistienda, it.textoalbaranidl AS textoalbaranidltienda, c.nombrecliente AS nombreclientecomanda, c.dirtipovia AS dirtipoviacomanda, c.direccion AS direccioncomanda, c.dirnum AS dirnumcomanda, c.dirotros AS dirotroscomanda, c.codpostal AS codpostalcomanda, c.ciudad AS ciudadcomanda, c.provincia AS provinciacomanda, c.email AS emailcomanda, c.telefono1 AS telefonocomanda, pac.codiso3 AS codpaiscomanda, ic.textoalbaranidl AS textoalbaranidlcomanda FROM idl_ecommerce eco INNER JOIN tpv_comandas c ON (eco.idtpv_comanda = c.idtpv_comanda AND eco.codcomanda = c.codigo) LEFT OUTER JOIN mg_datosenviocomanda de ON c.idtpv_comanda = de.idtpv_comanda LEFT OUTER JOIN paises pa ON de.mg_paisenv = pa.codpais LEFT OUTER JOIN idiomas i ON pa.codidioma = i.codidioma LEFT OUTER JOIN paises pac ON c.codpais = pac.codpais LEFT OUTER JOIN idiomas ic ON pac.codidioma = ic.codidioma LEFT OUTER JOIN tpv_tiendas t ON c.codtiendarecogida = t.codtienda LEFT OUTER JOIN paises pat ON t.codpais = pat.codpais LEFT OUTER JOIN idiomas it ON pat.codidioma = it.codidioma WHERE eco.envioidl = false AND (eco.idlogenvio IS NULL OR eco.idlogenvio = 0) AND (eco.imprimirfactura = false OR (eco.imprimirfactura = true AND eco.facturaimpresa = true)) AND (c.egcodpedidoweb is null or c.egcodpedidoweb <> 'Pendiente') AND eco.codcomanda IS NOT NULL ORDER BY c.fecha ASC, c.hora ASC LIMIT 1")
+        cx["cur"].execute("SELECT fal.id as idfaltante, pc.idpedido as idpedidocli, pc.codigo as codpedido, eco.id AS idecommerce, c.idtpv_comanda AS idtpv_comanda, c.codigo AS codigo, c.egcodfactura AS codfactura, (SELECT codalmacenidl FROM almacenesidl WHERE codalmacen = 'AWEB') AS codalmacen, de.mg_nombreenv AS nombrecliente, de.mg_apellidosenv AS apellidoscliente, c.fecha AS fecha, c.fecha AS fechasalida, de.mg_dirtipoviaenv AS dirtipovia, de.mg_direccionenv AS direccion, de.mg_dirnumenv AS dirnum, de.mg_dirotrosenv AS dirotros, de.mg_codpostalenv AS codpostal, de.mg_ciudadenv AS ciudad, de.mg_provinciaenv AS provincia, c.recogidatienda AS recogidatienda, c.codtiendarecogida AS codtiendarecogida, de.mg_email AS email, de.mg_telefonoenv AS telefono, c.cifnif AS cifnif, pa.codiso3 AS codpais, i.textoalbaranidl AS textoalbaranidl, eco.esregalo AS esregalo, eco.imprimiralbaran AS imprimiralbaran, eco.imprimirfactura AS imprimirfactura, eco.imprimirdedicatoria AS imprimirdedicatoria, eco.emisor AS emisor, eco.receptor as receptor, eco.mensajededicatoria AS mensajededicatoria, eco.transportista AS transportista, eco.metodoenvioidl AS metodoenvio, eco.tipo AS tipoenvio, eco.eseciweb AS eseciweb, t.codcliente AS clientetienda, t.descripcion AS nombretienda, t.dirtipovia AS dirtipoviatienda, t.direccion AS direcciontienda, t.dirnum AS dirnumtienda, t.dirotros AS dirotrostienda, t.codpostal AS codpostaltienda, t.ciudad AS ciudadtienda, t.provincia AS provinciatienda, pat.codiso3 AS codpaistienda, it.textoalbaranidl AS textoalbaranidltienda, c.nombrecliente AS nombreclientecomanda, c.dirtipovia AS dirtipoviacomanda, c.direccion AS direccioncomanda, c.dirnum AS dirnumcomanda, c.dirotros AS dirotroscomanda, c.codpostal AS codpostalcomanda, c.ciudad AS ciudadcomanda, c.provincia AS provinciacomanda, c.email AS emailcomanda, c.telefono1 AS telefonocomanda, pac.codiso3 AS codpaiscomanda, ic.textoalbaranidl AS textoalbaranidlcomanda FROM idl_ecommercefaltante fal INNER JOIN pedidoscli pc ON fal.idpedido = pc.idpedido INNER JOIN idl_ecommerce eco on fal.idtpv_comanda = eco.idtpv_comanda INNER JOIN tpv_comandas c ON (eco.idtpv_comanda = c.idtpv_comanda AND eco.codcomanda = c.codigo) LEFT OUTER JOIN mg_datosenviocomanda de ON c.idtpv_comanda = de.idtpv_comanda LEFT OUTER JOIN paises pa ON de.mg_paisenv = pa.codpais LEFT OUTER JOIN idiomas i ON pa.codidioma = i.codidioma LEFT OUTER JOIN paises pac ON c.codpais = pac.codpais LEFT OUTER JOIN idiomas ic ON pac.codidioma = ic.codidioma LEFT OUTER JOIN tpv_tiendas t ON c.codtiendarecogida = t.codtienda LEFT OUTER JOIN paises pat ON t.codpais = pat.codpais LEFT OUTER JOIN idiomas it ON pat.codidioma = it.codidioma WHERE fal.pedidocreado = true AND pc.enviado = false AND pc.fichero IS NULL AND pc.codserie = 'FL' AND pc.servido = 'No' AND pc.codigo <> '2020FL000001' ORDER BY c.fecha ASC, c.hora ASC LIMIT 1")
 
         rows = cx["cur"].fetchall()
-        idEcommerce = False
-        codComanda = False
+        idPedido = False
+        codPedido = False
 
         if len(rows) > 0:
             for q in rows:
-                codComanda = q["codigo"]
-                idEcommerce = int(q["idecommerce"])
-                if not creaXmlEnvioEcommerce(q, int16, cx):
-                    cx["cur"].execute("UPDATE idl_ecommerce SET envioidl = TRUE, idlogenvio = 0, confirmacionenvio = 'Si' WHERE id = " + str(idEcommerce))
+                codPedido = q["codpedido"]
+                idPedido = int(q["idpedidocli"])
+                if not creaXmlEnvioEcommercePc(q, int16, cx):
+                    cx["cur"].execute("UPDATE pedidoscli SET enviado = TRUE, fichero = '0' WHERE idpedido = " + str(idPedido))
                     cx["conn"].commit()
-                    cx["cur"].execute("DELETE FROM eg_fichprocesados WHERE tipo = 'IDL_ECOMMERCE'")
+                    cx["cur"].execute("DELETE FROM eg_fichprocesados WHERE tipo = 'IDL_ECOMMERCE_PC'")
                     cx["conn"].commit()
                     cierraConexion(cx)
-                    generaXmlEcommerce()
+                    generaXmlEcommercePc()
                     return True
 
             tree = ET.ElementTree(prepOrd)
-            tree.write("./ecommerce/xmlEcommerce_" + codComanda + ".xml")
+            tree.write("./ecommerce/xmlEcommercePc_" + codPedido + ".xml")
 
             xmlstring = tostring(prepOrd, 'utf-8', method="xml")
             datosCX = dameDatosConexion("WSIDL_ENVECO", cx)
@@ -53,12 +53,12 @@ def generaXmlEcommerce():
             url = datosCX["url"]
             # result = False
             result = post_request(url, header, xmlstring)
-            print(codComanda)
+            print(codPedido)
             # print(xmlstring)
             # print(result)
             # print(header)
             # print(url)
-            # cx["cur"].execute("DELETE FROM eg_fichprocesados WHERE tipo = 'IDL_ECOMMERCE'")
+            # cx["cur"].execute("DELETE FROM eg_fichprocesados WHERE tipo = 'IDL_ECOMMERCE_PC'")
             # cx["conn"].commit()
             # return False
 
@@ -67,10 +67,10 @@ def generaXmlEcommerce():
                 res[0] = False
                 res[1] = result
                 print(result)
-                print("Error enviando pedido ecommerce")
-                cx["cur"].execute("UPDATE idl_ecommerce SET envioidl = TRUE, idlogenvio = 0 WHERE id = " + str(idEcommerce))
+                print("Error enviando pedido ecommerce pc")
+                cx["cur"].execute("UPDATE pedidoscli SET enviado = TRUE, fichero = '0' WHERE idpedido = " + str(idPedido))
                 cx["conn"].commit()
-                cx["cur"].execute("DELETE FROM eg_fichprocesados WHERE tipo = 'IDL_ECOMMERCE'")
+                cx["cur"].execute("DELETE FROM eg_fichprocesados WHERE tipo = 'IDL_ECOMMERCE_PC'")
                 cx["conn"].commit()
                 return False
             else:
@@ -83,21 +83,21 @@ def generaXmlEcommerce():
                     status = child.find("status").text
 
                 tree = ET.ElementTree(root)
-                tree.write("./ecommerce/resEcommerce_" + codComanda + ".xml")
+                tree.write("./ecommerce/resEcommercePc_" + codPedido + ".xml")
 
-                idlog = registraLog("ENV_ECOMMERCE", xmlstring.decode("ISO8859-15"), res, cx)
+                idlog = registraLog("PC_ECOMMERCE", xmlstring.decode("ISO8859-15"), res, cx)
 
                 if status:
                     if status == "OK":
-                        cx["cur"].execute("UPDATE idl_ecommerce SET envioidl = TRUE, idlogenvio = " + str(idlog) + " WHERE id = " + str(idEcommerce))
+                        cx["cur"].execute("UPDATE pedidoscli SET enviado = TRUE, fichero = '" + str(idlog) + "' WHERE idpedido = " + str(idPedido))
                     else:
                         error = child.find("error_descriptions/error_description").text
                         print(error)
-                        cx["cur"].execute("UPDATE idl_ecommerce SET envioidl = TRUE, idlogenvio = 0 WHERE id = " + str(idEcommerce))
+                        cx["cur"].execute("UPDATE pedidoscli SET enviado = TRUE, fichero = '0' WHERE idpedido = " + str(idPedido))
                     cx["conn"].commit()
         else:
             print("No hay pedidos ecommerce que enviar")
-            cx["cur"].execute("DELETE FROM eg_fichprocesados WHERE tipo = 'IDL_ECOMMERCE'")
+            cx["cur"].execute("DELETE FROM eg_fichprocesados WHERE tipo = 'IDL_ECOMMERCE_PC'")
             cx["conn"].commit()
             return True
 
@@ -106,29 +106,21 @@ def generaXmlEcommerce():
         res[1] = e
         print(e)
 
-    cx["cur"].execute("DELETE FROM eg_fichprocesados WHERE tipo = 'IDL_ECOMMERCE'")
+    cx["cur"].execute("DELETE FROM eg_fichprocesados WHERE tipo = 'IDL_ECOMMERCE_PC'")
     cx["conn"].commit()
     cierraConexion(cx)
-    generaXmlEcommerce()
+    generaXmlEcommercePc()
 
     return True
 
 
-def creaXmlEnvioEcommerce(q, int16, cx):
-    # Jesús. Añado una comprobación para que no se envien líneas que estén en eg_lineasecommerceexcluidas
-    cx["cur"].execute("SELECT l.barcode AS barcode, l.cantidad AS cantidad, l.idtpv_linea AS idtpv_linea, l.descripcion AS descripcion FROM tpv_lineascomanda l INNER JOIN articulos a ON l.referencia = a.referencia LEFT OUTER JOIN eg_lineasecommerceexcluidas le ON l.idtpv_linea = le.idtpv_linea WHERE l.idtpv_comanda = " + str(q["idtpv_comanda"]) + " AND l.cantidad > 0 AND a.nostock = FALSE AND le.id IS NULL")
+def creaXmlEnvioEcommercePc(q, int16, cx):
+    cx["cur"].execute("SELECT l.barcode AS barcode, l.cantidad AS cantidad, l.idlinea AS idtpv_linea, l.descripcion AS descripcion FROM lineaspedidoscli l WHERE l.idpedido = " + str(q["idpedidocli"]) + " AND l.cantidad > 0")
     rows = cx["cur"].fetchall()
     if len(rows) <= 0:
         return False
 
-    esContraReembolso = False
     recogidaTienda = False
-
-    cx["cur"].execute("SELECT SUM(p.importe) AS importe FROM tpv_pagoscomanda p WHERE p.idtpv_comanda = " + str(q["idtpv_comanda"]) + " AND p.codpago = 'CREE' AND (p.codcomanda like 'WDV%' OR p.codcomanda like 'WEB%') GROUP BY p.codpago, p.idtpv_comanda HAVING SUM(p.importe) > 0")
-    rowsPago = cx["cur"].fetchall()
-
-    if len(rowsPago) > 0:
-        esContraReembolso = True
 
     if q["recogidatienda"]:
         cx["cur"].execute("SELECT codtienda AS codtienda FROM tpv_tiendas t WHERE t.codtienda = '" + str(q["codtiendarecogida"]) + "'")
@@ -198,14 +190,9 @@ def creaXmlEnvioEcommerce(q, int16, cx):
     ET.SubElement(rub110, "activity_code").text = "GNS"
     ET.SubElement(rub110, "physical_depot_code").text = "GNS"
     ET.SubElement(rub110, "originator_code").text = "EL_GANSO"
-    ET.SubElement(rub110, "originator_reference").text = "T" + q["codigo"]
+    ET.SubElement(rub110, "originator_reference").text = "T" + q["codpedido"] + "01"
     ET.SubElement(rub110, "preparation_type_code").text = "010"
     ET.SubElement(rub110, "end_consignee_code").text = "ECOMMERCE"
-
-    if esContraReembolso:
-        for p in rowsPago:
-            ET.SubElement(rub110, "end_consignee_reference").text = dameImporteDecimal(str(p["importe"]))
-            continue
 
     ET.SubElement(rub110, "planned_final_delivery_date_century").text = str(q["fechasalida"])[0:2]
     ET.SubElement(rub110, "planned_final_delivery_date_year").text = str(q["fechasalida"])[2:4]
@@ -228,7 +215,7 @@ def creaXmlEnvioEcommerce(q, int16, cx):
     ET.SubElement(rub111, "activity_code").text = "GNS"
     ET.SubElement(rub111, "physical_depot_code").text = "GNS"
     ET.SubElement(rub111, "originator_code").text = "EL_GANSO"
-    ET.SubElement(rub111, "originator_reference").text = "T" + q["codigo"]
+    ET.SubElement(rub111, "originator_reference").text = "T" + q["codpedido"] + "01"
 
     if str(q["tipoenvio"]) == "CAMBIO":
         ET.SubElement(rub111, "preparation_order_reason_code").text = "DEV"
@@ -246,7 +233,7 @@ def creaXmlEnvioEcommerce(q, int16, cx):
     ET.SubElement(rub11A, "activity_code").text = "GNS"
     ET.SubElement(rub11A, "physical_depot_code").text = "GNS"
     ET.SubElement(rub11A, "originator_code").text = "EL_GANSO"
-    ET.SubElement(rub11A, "originator_reference").text = "T" + q["codigo"]
+    ET.SubElement(rub11A, "originator_reference").text = "T" + q["codpedido"] + "01"
     ET.SubElement(rub11A, "address_type_code").text = "010"
 
     direccion = formateaCadenaEcommerce(direccion)
@@ -271,7 +258,7 @@ def creaXmlEnvioEcommerce(q, int16, cx):
     ET.SubElement(rub114, "activity_code").text = "GNS"
     ET.SubElement(rub114, "physical_depot_code").text = "GNS"
     ET.SubElement(rub114, "originator_code").text = "EL_GANSO"
-    ET.SubElement(rub114, "originator_reference").text = "T" + q["codigo"]
+    ET.SubElement(rub114, "originator_reference").text = "T" + q["codpedido"] + "01"
     ET.SubElement(rub114, "contact_type_code").text = "010"
     ET.SubElement(rub114, "title_code").text = "1"
 
@@ -298,7 +285,7 @@ def creaXmlEnvioEcommerce(q, int16, cx):
     ET.SubElement(rub115, "activity_code").text = "GNS"
     ET.SubElement(rub115, "physical_depot_code").text = "GNS"
     ET.SubElement(rub115, "originator_code").text = "EL_GANSO"
-    ET.SubElement(rub115, "originator_reference").text = "T" + q["codigo"]
+    ET.SubElement(rub115, "originator_reference").text = "T" + q["codpedido"] + "01"
     ET.SubElement(rub115, "contact_type_code").text = "010"
     ET.SubElement(rub115, "mobile_phone_number").text = formateaCadenaEcommerceTelefono(str(q["telefono" + tipoVenta])[0:20])
 
@@ -316,7 +303,7 @@ def creaXmlEnvioEcommerce(q, int16, cx):
         ET.SubElement(rub119, "activity_code").text = "GNS"
         ET.SubElement(rub119, "physical_depot_code").text = "GNS"
         ET.SubElement(rub119, "originator_code").text = "EL_GANSO"
-        ET.SubElement(rub119, "originator_reference").text = "T" + q["codigo"]
+        ET.SubElement(rub119, "originator_reference").text = "T" + q["codpedido"] + "01"
         ET.SubElement(rub119, "comment_line_no").text = cerosIzquierda(contador, 3)
         ET.SubElement(rub119, "comment_group").text = "INS"
         ET.SubElement(rub119, "comment").text = "EL CORTE INGLES"
@@ -327,21 +314,10 @@ def creaXmlEnvioEcommerce(q, int16, cx):
         ET.SubElement(rub119, "activity_code").text = "GNS"
         ET.SubElement(rub119, "physical_depot_code").text = "GNS"
         ET.SubElement(rub119, "originator_code").text = "EL_GANSO"
-        ET.SubElement(rub119, "originator_reference").text = "T" + q["codigo"]
+        ET.SubElement(rub119, "originator_reference").text = "T" + q["codpedido"] + "01"
         ET.SubElement(rub119, "comment_line_no").text = cerosIzquierda(contador, 3)
         ET.SubElement(rub119, "comment_group").text = "INS"
         ET.SubElement(rub119, "comment").text = "REGALO"
-        contador += 1
-
-    if esContraReembolso:
-        rub119 = ET.SubElement(rub110, "rub119")
-        ET.SubElement(rub119, "activity_code").text = "GNS"
-        ET.SubElement(rub119, "physical_depot_code").text = "GNS"
-        ET.SubElement(rub119, "originator_code").text = "EL_GANSO"
-        ET.SubElement(rub119, "originator_reference").text = "T" + q["codigo"]
-        ET.SubElement(rub119, "comment_line_no").text = cerosIzquierda(contador, 3)
-        ET.SubElement(rub119, "comment_group").text = "INS"
-        ET.SubElement(rub119, "comment").text = "REEMBOLSO 1 SOLO PACK"
         contador += 1
 
     if recogidaTienda:
@@ -349,7 +325,7 @@ def creaXmlEnvioEcommerce(q, int16, cx):
         ET.SubElement(rub119, "activity_code").text = "GNS"
         ET.SubElement(rub119, "physical_depot_code").text = "GNS"
         ET.SubElement(rub119, "originator_code").text = "EL_GANSO"
-        ET.SubElement(rub119, "originator_reference").text = "T" + q["codigo"]
+        ET.SubElement(rub119, "originator_reference").text = "T" + q["codpedido"] + "01"
         ET.SubElement(rub119, "comment_line_no").text = cerosIzquierda(contador, 3)
         ET.SubElement(rub119, "comment_group").text = "INS"
         ET.SubElement(rub119, "comment").text = "ALBARAN POR FUERA"
@@ -359,7 +335,7 @@ def creaXmlEnvioEcommerce(q, int16, cx):
     ET.SubElement(rub119, "activity_code").text = "GNS"
     ET.SubElement(rub119, "physical_depot_code").text = "GNS"
     ET.SubElement(rub119, "originator_code").text = "EL_GANSO"
-    ET.SubElement(rub119, "originator_reference").text = "T" + q["codigo"]
+    ET.SubElement(rub119, "originator_reference").text = "T" + q["codpedido"] + "01"
     ET.SubElement(rub119, "comment_line_no").text = cerosIzquierda(contador, 3)
     ET.SubElement(rub119, "comment_group").text = "ALB"
 
@@ -379,7 +355,7 @@ def creaXmlEnvioEcommerce(q, int16, cx):
             ET.SubElement(rub119, "activity_code").text = "GNS"
             ET.SubElement(rub119, "physical_depot_code").text = "GNS"
             ET.SubElement(rub119, "originator_code").text = "EL_GANSO"
-            ET.SubElement(rub119, "originator_reference").text = "T" + q["codigo"]
+            ET.SubElement(rub119, "originator_reference").text = "T" + q["codpedido"] + "01"
             ET.SubElement(rub119, "comment_line_no").text = cerosIzquierda(contador, 3)
             ET.SubElement(rub119, "comment_group").text = "ME1"
             ET.SubElement(rub119, "comment").text = me1
@@ -392,7 +368,7 @@ def creaXmlEnvioEcommerce(q, int16, cx):
                 ET.SubElement(rub119, "activity_code").text = "GNS"
                 ET.SubElement(rub119, "physical_depot_code").text = "GNS"
                 ET.SubElement(rub119, "originator_code").text = "EL_GANSO"
-                ET.SubElement(rub119, "originator_reference").text = "T" + q["codigo"]
+                ET.SubElement(rub119, "originator_reference").text = "T" + q["codpedido"] + "01"
                 ET.SubElement(rub119, "comment_line_no").text = cerosIzquierda(contador, 3)
                 ET.SubElement(rub119, "comment_group").text = "ME2"
                 ET.SubElement(rub119, "comment").text = me2
@@ -405,7 +381,7 @@ def creaXmlEnvioEcommerce(q, int16, cx):
                 ET.SubElement(rub119, "activity_code").text = "GNS"
                 ET.SubElement(rub119, "physical_depot_code").text = "GNS"
                 ET.SubElement(rub119, "originator_code").text = "EL_GANSO"
-                ET.SubElement(rub119, "originator_reference").text = "T" + q["codigo"]
+                ET.SubElement(rub119, "originator_reference").text = "T" + q["codpedido"] + "01"
                 ET.SubElement(rub119, "comment_line_no").text = cerosIzquierda(contador, 3)
                 ET.SubElement(rub119, "comment_group").text = "ME3"
                 ET.SubElement(rub119, "comment").text = me3
@@ -417,7 +393,7 @@ def creaXmlEnvioEcommerce(q, int16, cx):
             ET.SubElement(rub119, "activity_code").text = "GNS"
             ET.SubElement(rub119, "physical_depot_code").text = "GNS"
             ET.SubElement(rub119, "originator_code").text = "EL_GANSO"
-            ET.SubElement(rub119, "originator_reference").text = "T" + q["codigo"]
+            ET.SubElement(rub119, "originator_reference").text = "T" + q["codpedido"] + "01"
             ET.SubElement(rub119, "comment_line_no").text = cerosIzquierda(contador, 3)
             ET.SubElement(rub119, "comment_group").text = "PAR"
             ET.SubElement(rub119, "comment").text = receptor
@@ -429,7 +405,7 @@ def creaXmlEnvioEcommerce(q, int16, cx):
             ET.SubElement(rub119, "activity_code").text = "GNS"
             ET.SubElement(rub119, "physical_depot_code").text = "GNS"
             ET.SubElement(rub119, "originator_code").text = "EL_GANSO"
-            ET.SubElement(rub119, "originator_reference").text = "T" + q["codigo"]
+            ET.SubElement(rub119, "originator_reference").text = "T" + q["codpedido"] + "01"
             ET.SubElement(rub119, "comment_line_no").text = cerosIzquierda(contador, 3)
             ET.SubElement(rub119, "comment_group").text = "DE"
             ET.SubElement(rub119, "comment").text = emisor
@@ -440,17 +416,17 @@ def creaXmlEnvioEcommerce(q, int16, cx):
         ET.SubElement(rub119, "activity_code").text = "GNS"
         ET.SubElement(rub119, "physical_depot_code").text = "GNS"
         ET.SubElement(rub119, "originator_code").text = "EL_GANSO"
-        ET.SubElement(rub119, "originator_reference").text = "T" + q["codigo"]
+        ET.SubElement(rub119, "originator_reference").text = "T" + q["codpedido"] + "01"
         ET.SubElement(rub119, "comment_line_no").text = cerosIzquierda(contador, 3)
         ET.SubElement(rub119, "comment_group").text = "FAC"
-        ET.SubElement(rub119, "comment").text = "T" + q["codigo"] + ".pdf"
+        ET.SubElement(rub119, "comment").text = "T" + q["codpedido"] + ".pdf"
         contador += 1
 
     rub119 = ET.SubElement(rub110, "rub119")
     ET.SubElement(rub119, "activity_code").text = "GNS"
     ET.SubElement(rub119, "physical_depot_code").text = "GNS"
     ET.SubElement(rub119, "originator_code").text = "EL_GANSO"
-    ET.SubElement(rub119, "originator_reference").text = "T" + q["codigo"]
+    ET.SubElement(rub119, "originator_reference").text = "T" + q["codpedido"] + "01"
     ET.SubElement(rub119, "comment_line_no").text = cerosIzquierda(contador, 3)
     ET.SubElement(rub119, "comment_group").text = "TCK"
 
@@ -469,7 +445,7 @@ def creaXmlEnvioEcommerce(q, int16, cx):
     ET.SubElement(rub119, "activity_code").text = "GNS"
     ET.SubElement(rub119, "physical_depot_code").text = "GNS"
     ET.SubElement(rub119, "originator_code").text = "EL_GANSO"
-    ET.SubElement(rub119, "originator_reference").text = "T" + q["codigo"]
+    ET.SubElement(rub119, "originator_reference").text = "T" + q["codpedido"] + "01"
     ET.SubElement(rub119, "comment_line_no").text = cerosIzquierda(contador, 3)
     ET.SubElement(rub119, "comment_group").text = "TRA"
 
@@ -484,9 +460,6 @@ def creaXmlEnvioEcommerce(q, int16, cx):
     # if str(q["tipoenvio"]) == "CAMBIO" and transportista != "SEUR":
         # metodoEnvio = "UPS CAMBIO"
 
-    if esContraReembolso and transportista == "SEUR":
-        metodoEnvio = metodoEnvio + " R"
-
     if q["imprimirfactura"] and transportista == "GLS":
         metodoEnvio = "12 3"
 
@@ -495,7 +468,7 @@ def creaXmlEnvioEcommerce(q, int16, cx):
     if q["imprimirfactura"]:
         fraPdf = False
         try:
-            ruta = "/home/elganso/facturasIdlPdf/" + "T" + q["codigo"] + ".pdf"
+            ruta = "/home/elganso/facturasIdlPdf/" + "T" + q["codpedido"] + "01.pdf"
             fraPdf = open(ruta, "rb").read()
             fra_base64 = str(base64.b64encode(fraPdf))
             fra_base64 = formateaCadenaEcommerce(fra_base64)[1:len(fra_base64)]
@@ -503,7 +476,7 @@ def creaXmlEnvioEcommerce(q, int16, cx):
             ET.SubElement(rub11F, "activity_code").text = "GNS"
             ET.SubElement(rub11F, "physical_depot_code").text = "GNS"
             ET.SubElement(rub11F, "originator_code").text = "EL_GANSO"
-            ET.SubElement(rub11F, "originator_reference").text = "T" + q["codigo"]
+            ET.SubElement(rub11F, "originator_reference").text = "T" + q["codpedido"] + "01"
             ET.SubElement(rub11F, "invoice_data").text = fra_base64
             # print(fra_base64)
         except Exception as e:
@@ -515,7 +488,7 @@ def creaXmlEnvioEcommerce(q, int16, cx):
         ET.SubElement(rub120, "activity_code").text = "GNS"
         ET.SubElement(rub120, "physical_depot_code").text = "GNS"
         ET.SubElement(rub120, "originator_code").text = "EL_GANSO"
-        ET.SubElement(rub120, "originator_reference").text = "T" + q["codigo"]
+        ET.SubElement(rub120, "originator_reference").text = "T" + q["codpedido"] + "01"
         ET.SubElement(rub120, "originator_reference_line_no").text = str(i)
         ET.SubElement(rub120, "item_code").text = str(l["barcode"])[0:16]
         ET.SubElement(rub120, "item_lv_code").text = "11"
@@ -523,16 +496,16 @@ def creaXmlEnvioEcommerce(q, int16, cx):
         ET.SubElement(rub120, "owner_code_to_prepare").text = "ECO"
         ET.SubElement(rub120, "grade_code_to_prepare").text = "STD"
 
-        if esContraReembolso or transportista != "SEUR" or q["imprimirfactura"] or (q["eseciweb"] and str(q["eseciweb"]) != "None" and str(q["eseciweb"]) != ""):
+        if transportista != "SEUR" or q["imprimirfactura"] or (q["eseciweb"] and str(q["eseciweb"]) != "None" and str(q["eseciweb"]) != ""):
             rub121 = ET.SubElement(rub120, "rub121")
             ET.SubElement(rub121, "activity_code").text = "GNS"
             ET.SubElement(rub121, "physical_depot_code").text = "GNS"
             ET.SubElement(rub121, "originator_code").text = "EL_GANSO"
-            ET.SubElement(rub121, "originator_reference").text = "T" + q["codigo"]
+            ET.SubElement(rub121, "originator_reference").text = "T" + q["codpedido"] + "01"
             ET.SubElement(rub121, "originator_reference_line_no").text = str(i)
             ET.SubElement(rub121, "flag_cross-docking").text = "1"
             ET.SubElement(rub121, "flag_cross-docking_even_if_pick_run").text = "1"
-            ET.SubElement(rub121, "pro_reservation_reference").text = "T" + q["codigo"]
+            ET.SubElement(rub121, "pro_reservation_reference").text = "T" + q["codpedido"] + "01"
         i += 1
 
     return True

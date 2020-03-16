@@ -14,8 +14,8 @@ def creaConexion():
 
 def conectaBd():
     try:
-        connect_str = "user='lorena' password='555zapato' dbname='elganso_ctr'"
-        connect_str += " host='localhost' port='5432'"
+        connect_str = "user='elganso' password='elganso' dbname='elganso'"
+        connect_str += " host='172.26.13.14' port='5432'"
 
         return psycopg2.connect(connect_str)
 
@@ -37,7 +37,7 @@ def dameDatosConexion(conexion, cx):
     row = cx["cur"].fetchall()
     valor = row[0]["valor"]
     datosCX = json.loads(valor)
-    
+
     return datosCX
 
 

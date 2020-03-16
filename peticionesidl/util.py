@@ -198,3 +198,17 @@ def cerosIzquierda(numero, totalCifras):
         numero = "0" + numero
 
     return numero
+
+
+def formateaCadenaEcommerceTelefono(cadena):
+    validos = "1234567890+"
+
+    cOut = ""
+    i = 0
+
+    while i < len(cadena):
+        if validos.find(cadena[i]) >= 0:
+            cOut += cadena[i]
+        i = i + 1
+
+    return cOut
