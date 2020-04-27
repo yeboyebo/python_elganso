@@ -17,7 +17,7 @@ def fechaEntrega():
         url = datosCX["url"]
         auth = datosCX["auth"]
         header = {'Authorization': auth, 'Content-Type': "application/json", 'Accept': "application/json"}
-        cx["cur"].execute("SELECT v.idweb as idweb, v.id AS id, v.datosventa AS datosventa FROM ew_ventaseciweb v INNER JOIN idl_ecommerce e ON v.idtpv_comanda = e.idtpv_comanda WHERE v.estado = 'SHIPPED' AND v.envioinformado = TRUE AND v.fechaentregainformada = FALSE AND e.fechamagento < CURRENT_DATE-2")
+        cx["cur"].execute("SELECT v.idweb as idweb, v.id AS id, v.datosventa AS datosventa, e.fechaentregamrw, e.horaentregamrw FROM ew_ventaseciweb v INNER JOIN idl_ecommerce e ON v.idtpv_comanda = e.idtpv_comanda WHERE v.estado = 'SHIPPED' AND v.envioinformado = TRUE AND v.fechaentregainformada = FALSE AND ((e.fechamagento < CURRENT_DATE and e.transportista <> 'MRW') OR ( e.fechaentregamrw IS NOT NULL AND e.entregadomrw = TRUE AND e.transportista = 'MRW'))")
 
         rows = cx["cur"].fetchall()
         if len(rows) > 0:

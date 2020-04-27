@@ -20,7 +20,8 @@ def generarEnvioMagento():
         auth = datosCX["auth"]
         header = {"Authorization": auth}
         print("URL: ", url)
-        cx["cur"].execute("SELECT codcomanda as incrementid, numseguimiento as trackingid, confirmacionenvio as confirmacionenvio FROM idl_ecommerce WHERE (numseguimientoinformado IS NULL OR numseguimientoinformado = FALSE) AND (confirmacionenvio IN ('Si','Parcial') OR idtpv_comanda IN (select idtpv_comanda FROM idl_ecommercefaltante WHERE enviada = false)) AND (tipo = 'VENTA' OR tipo = 'CAMBIO') AND (eseciweb = false OR eseciweb IS NULL) AND (codcomanda LIKE 'WEB%' OR codcomanda LIKE 'WDV%')")
+        #cx["cur"].execute("SELECT codcomanda as incrementid, numseguimiento as trackingid, confirmacionenvio as confirmacionenvio FROM idl_ecommerce WHERE (numseguimientoinformado IS NULL OR numseguimientoinformado = FALSE) AND (confirmacionenvio IN ('Si','Parcial') OR idtpv_comanda IN (select idtpv_comanda FROM idl_ecommercefaltante WHERE enviada = false)) AND (tipo = 'VENTA' OR tipo = 'CAMBIO') AND (eseciweb = false OR eseciweb IS NULL) AND (codcomanda LIKE 'WEB%' OR codcomanda LIKE 'WDV%')")
+        cx["cur"].execute("SELECT id as idseguimiento, coddocumento as incrementid, numseguimiento as trackingid, items as items FROM eg_seguimientoenvios WHERE (numseguimientoinformado IS NULL OR numseguimientoinformado = FALSE) AND (tipo = 'ECOMMERCE' OR tipo = 'VIAJE') AND (coddocumento LIKE 'WEB%' OR coddocumento LIKE 'WDV%') AND numseguimiento IS NOT NULL AND numseguimiento <> '' AND numseguimiento <> 'ERROR'")
 
         rows = cx["cur"].fetchall()
         if len(rows) > 0:
@@ -29,11 +30,9 @@ def generarEnvioMagento():
                 if numSeguimiento == "None":
                     numSeguimiento = ""
 
-                estado = "complete"
-                if str(p["confirmacionenvio"]) == 'Parcial' or str(p["confirmacionenvio"]) == 'No':
-                    estado = "holded"
+                estado = "en_camino"
 
-                dataJson = '[{"increment_id": "' + str(p["incrementid"])[3:len(str(p["incrementid"]))] + '", "status": "' + estado + '", "trackingId": "' + numSeguimiento + '"}]'
+                dataJson = '[{"increment_id": "' + str(p["incrementid"])[3:len(str(p["incrementid"]))] + '", "status": "' + estado + '", "trackingId": "' + numSeguimiento + '", "items": [' + str(p["items"]) + ']}]'
                 print(dataJson)
                 result = post_request(url, header, dataJson)
                 result = True
@@ -41,6 +40,8 @@ def generarEnvioMagento():
                     return False
 
                 cx["cur"].execute("UPDATE idl_ecommerce SET numseguimientoinformado = true, fechamagento = CURRENT_DATE, horamagento = CURRENT_TIME WHERE codcomanda = '" + str(p["incrementid"]) + "'")
+                cx["conn"].commit()
+                cx["cur"].execute("UPDATE eg_seguimientoenvios SET numseguimientoinformado = true, fechamagento = CURRENT_DATE, horamagento = CURRENT_TIME WHERE id = " + str(p["idseguimiento"]))
                 cx["conn"].commit()
 
         else:

@@ -17,7 +17,7 @@ def trackingInfo():
         url = datosCX["url"]
         auth = datosCX["auth"]
         header = {'Authorization': auth, 'Content-Type': "application/json", 'Accept': "application/json"}
-        cx["cur"].execute("SELECT e.idtpv_comanda AS idtpv_comanda, e.numseguimiento AS trackingnumber, v.id AS id, v.idweb as idweb, v.datosenvio AS datosenvio, e.transportista AS transportista, e.metodoenvioidl AS metodoenvio FROM ew_ventaseciweb v INNER JOIN idl_ecommerce e ON v.idtpv_comanda = e.idtpv_comanda WHERE v.estado = 'SHIPPING' AND v.aceptado = TRUE AND v.infoclienterecibida = TRUE AND v.trackinginformado = FALSE AND e.eseciweb = TRUE AND e.numseguimiento IS NOT NULL AND e.numseguimiento <> '' AND e.numseguimientoinformado = FALSE")
+        cx["cur"].execute("SELECT s.coddocumento AS coddocumento, e.idtpv_comanda AS idtpv_comanda, e.numseguimiento AS trackingnumber, v.id AS id, v.idweb as idweb, v.datosenvio AS datosenvio, e.transportista AS transportista, e.metodoenvioidl AS metodoenvio FROM ew_ventaseciweb v INNER JOIN idl_ecommerce e ON v.idtpv_comanda = e.idtpv_comanda INNER JOIN eg_seguimientoenvios s ON e.codcomanda = s.coddocumento WHERE v.estado = 'SHIPPING' AND v.aceptado = TRUE AND v.infoclienterecibida = TRUE AND v.trackinginformado = FALSE AND e.eseciweb = TRUE AND s.numseguimiento IS NOT NULL AND s.numseguimiento <> '' AND (s.numseguimientoinformado = FALSE OR s.numseguimientoinformado IS NULL)")
 
         rows = cx["cur"].fetchall()
         if len(rows) > 0:
@@ -34,6 +34,8 @@ def trackingInfo():
                     cx["cur"].execute("UPDATE ew_ventaseciweb SET estado = 'TRACKING_INFO', trackinginformado = true WHERE id = " + str(p["id"]))
                     cx["conn"].commit()
                     cx["cur"].execute("UPDATE idl_ecommerce SET fechamagento = CURRENT_DATE, horamagento = CURRENT_TIME, numseguimientoinformado = true WHERE idtpv_comanda = " + str(p["idtpv_comanda"]))
+                    cx["conn"].commit()
+                    cx["cur"].execute("UPDATE eg_seguimientoenvios SET fechamagento = CURRENT_DATE, horamagento = CURRENT_TIME, numseguimientoinformado = true WHERE coddocumento = '" + str(p["coddocumento"]) + "'")
 
                 cx["conn"].commit()
         else:
